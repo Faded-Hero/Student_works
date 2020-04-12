@@ -7,42 +7,49 @@ WIDTH = 450
 HEIGHT = 450
 lon = '53.200425'
 lat = '56.867347'
-size = 10
+size = 15
 
 def map_request(lo, la, Width, Height, size):
     api_server = "http://static-maps.yandex.ru/1.x/"
 
     lon = lo
     lat = la
-    delta = "0.002"
+    z = size
     w = Width
     h = Height
 
     params = {
         "ll": ",".join([lon, lat]),
-        "spn": ",".join([delta, delta]),
-        "size": ",".join([w, h]),
+        "size": ",".join([str(w), str(h)]),
+        "z": str(z),
         "l": "map"
     }
     response = requests.get(api_server, params=params)
     return response
 
-
+response = map_request(lon, lat, WIDTH, HEIGHT, size)
+map_file = "map.png"
+with open(map_file, "wb") as file:
+    file.write(response.content)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 screen.blit(pygame.image.load(map_file), (0, 0))
 pygame.display.flip()
-while pygame.event.wait().type != pygame.QUIT:
-    response = map_request(lon, lat, WIDTH, HEIGHT)
+while 1:
+    response = map_request(lon, lat, WIDTH, HEIGHT, size)
     map_file = "map.png"
     with open(map_file, "wb") as file:
         file.write(response.content)
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_PAGEUP:
-            if size != 17:
-                size += 1
-        elif event.key == pygame.K_PAGEDOWN:
-            if size != 0:
-                size -= 1
-pygame.quit()
+    screen.blit(pygame.image.load(map_file), (0, 0))
+    for i in pygame.event.get():
+        if i.type == pygame.QUIT:
+            exit()
+        elif i.type == pygame.KEYDOWN:
+            if i.key == pygame.K_PAGEUP:
+                if size != 17:
+                    size += 1
+            elif i.key == pygame.K_PAGEDOWN:
+                if size != 0:
+                    size -= 1
+    pygame.display.flip()
 os.remove(map_file)

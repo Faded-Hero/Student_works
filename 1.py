@@ -5,6 +5,8 @@ import requests
 
 WIDTH = 450
 HEIGHT = 450
+lon = '53.200425'
+lat = '56.867347'
 
 def map_request(lo, la, Width, Height):
     api_server = "http://static-maps.yandex.ru/1.x/"
@@ -18,17 +20,16 @@ def map_request(lo, la, Width, Height):
     params = {
         "ll": ",".join([lon, lat]),
         "spn": ",".join([delta, delta]),
-        "size": ",".join([w, h]),
+        "size": ",".join([str(w), str(h)]),
         "l": "map"
     }
     response = requests.get(api_server, params=params)
     return response
 
-response = requests.get(map_request)
+response = map_request(lon, lat, WIDTH, HEIGHT)
 map_file = "map.png"
 with open(map_file, "wb") as file:
     file.write(response.content)
-
 pygame.init()
 screen = pygame.display.set_mode((450, 450))
 screen.blit(pygame.image.load(map_file), (0, 0))
